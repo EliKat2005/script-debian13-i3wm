@@ -1,0 +1,240 @@
+# Tecla modificadora (Windows/Super)
+set $mod Mod4
+
+# Tamaña de la fuente
+font pango:Noto Sans 12
+
+#####
+# APLICACIONES AL INICIO (AUTOSTART)
+#####
+
+# Picom al inicio
+exec --no-startup-id sh -c 'killall -q picom 2>/dev/null || true; sleep 0.12; picom --config ~/.config/picom/picom.conf --daemon &'
+
+# Gestor de políticas de autenticación
+exec --no-startup-id lxpolkit &
+
+# Aplicación de red (Network Manager)
+exec --no-startup-id nm-applet
+
+# Sistema de notificaciones
+exec --no-startup-id dunst
+
+# Gestor de dispositivos USB y discos extraíbles
+exec --no-startup-id udiskie --tray
+
+# Gestor de Bluetooth
+exec --no-startup-id blueman-applet
+
+# Bloqueo de pantalla al suspender
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+
+# Fondo de pantalla
+exec_always --no-startup-id feh --bg-fill /mnt/multimedia/wallpapers/default.jpg
+
+#####
+# CONFIGURACIÓN DE BORDES Y VENTANAS
+#####
+
+# Bordes sutiles para ventanas en mosaico
+default_border pixel 3
+
+# Bordes más delgados para ventanas flotantes
+default_floating_border pixel 1
+
+# Ocultar bordes en los bordes de la pantalla cuando hay una ventana
+hide_edge_borders smart
+
+# Arrastrar ventanas flotantes con Mod (Super/Windows)
+floating_modifier Mod4
+
+#####
+# CONFIGURACIÓN DE WORKSPACES
+#####
+
+# Workspaces con nombres descriptivos
+set $ws1 "1:Term"
+set $ws2 "2:Web" 
+set $ws3 "3:Code"
+set $ws4 "4:File"
+set $ws5 "5:Ferdium"
+set $ws6 "6:Media"
+
+#####
+# ATAJOS DE TECLADO - NAVEGACIÓN Y GESTIÓN DE VENTANAS
+#####
+
+# Foco entre ventanas (flechas)
+bindsym $mod+Left  focus left
+bindsym $mod+Down  focus down
+bindsym $mod+Up    focus up
+bindsym $mod+Right focus right
+
+# Mover ventanas entre contenedores
+bindsym $mod+Shift+Left  move left
+bindsym $mod+Shift+Down  move down
+bindsym $mod+Shift+Up    move up
+bindsym $mod+Shift+Right move right
+
+# Gestión de layouts y división
+bindsym $mod+v split vertical
+bindsym $mod+b split horizontal
+bindsym $mod+e layout toggle split
+bindsym $mod+s layout stacking
+bindsym $mod+Shift+w layout tabbed
+bindsym $mod+Shift+f fullscreen toggle
+bindsym $mod+Shift+space floating toggle
+
+# Foco en contenedor padre
+bindsym $mod+a focus parent
+
+# Cerrar ventana enfocada
+bindsym $mod+Shift+q kill
+
+#####
+# ATAJOS DE TECLADO - WORKSPACES
+#####
+
+# Navegación entre workspaces
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+
+# Mover ventanas entre workspaces
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+
+#####
+# ATAJOS DE TECLADO - LANZADORES DE APLICACIONES
+#####
+
+# Lanzadores principales
+bindsym $mod+Return exec prime-run kitty                    # Terminal
+bindsym $mod+space exec rofi -show drun -show-icons -b   # Menú de aplicaciones
+bindsym $mod+g exec prime-run kitty -e ranger          # Gestor de archivos en terminal
+
+# Aplicaciones rápidas
+bindsym $mod+w exec brave-browser                          # Navegador web
+bindsym $mod+f exec pcmanfm                           # Gestor de archivos gráfico
+bindsym $mod+h exec prime-run heroic
+bindsym $mod+Shift+g exec flatpak run com.dec05eba.gpu_screen_recorder
+bindsym $mod+Ctrl+p exec mpv --player-operation-mode=pseudo-gui  # Reproductor multimedia
+bindsym $mod+Ctrl+z exec zathura                      # Visor de PDF
+
+######
+# ATAJOS DE TECLADO - CONTROLES DE HARDWARE
+######
+
+# Variable para refrescar la barra de estado
+set $refresh_i3status killall -SIGUSR1 i3status
+
+# Control de volumen con PipeWire (pactl)
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+
+# Control de brillo (brightnessctl)
+bindsym XF86MonBrightnessUp exec --no-startup-id /usr/local/bin/i3-brightness up
+bindsym XF86MonBrightnessDown exec --no-startup-id /usr/local/bin/i3-brightness down
+
+#####
+# ATAJOS DE TECLADO - HERRAMIENTAS Y UTILIDADES
+#####
+
+bindsym Print exec --no-startup-id flameshot gui       # Captura de pantalla
+bindsym XF86Calculator exec --no-startup-id galculator # Calculadora
+bindsym $mod+p exec --no-startup-id arandr             # Configurador de pantalla
+
+#####
+# Ventanas que deben abrirse flotantes por defecto
+#####
+for_window [class="spotify"] floating enable
+for_window [class="Bitwarden"] floating enable
+for_window [class="stacer"] floating enable
+for_window [class="GParted"] floating enable
+for_window [class="gnome-software"] floating enable
+for_window [class="Galculator"] floating enable
+for_window [class="Blueman-manager"] floating enable
+for_window [class="Nm-connection-editor"] floating enable
+for_window [class="Arandr"] floating enable
+for_window [title="Guardar como"] floating enable
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+
+#####
+# MODO DE REDIMENSIONAMIENTO
+#####
+
+mode "resize" {
+    # Las flechas agrandan el borde correspondiente
+    bindsym Left resize shrink left 10 px
+    # Mueve el borde izquierdo hacia la izquierda
+    bindsym Down resize grow down 10 px
+    # Mueve el borde inferior hacia abajo
+    bindsym Up resize grow up 10 px
+    # Mueve el borde superior hacia arriba
+    bindsym Right resize grow right 10 px
+    # Mueve el borde derecho hacia la derecha
+
+    # Shift + flechas SHRINK (encogen) el borde correspondiente
+    bindsym Shift+Left resize grow left 10 px
+    # Mueve el borde izquierdo hacia la derecha
+    bindsym Shift+Down resize shrink down 10 px
+    # Mueve el borde inferior hacia arriba
+    bindsym Shift+Up resize shrink up 10 px
+    # Mueve el borde superior hacia abajo
+    bindsym Shift+Right resize shrink right 10 px
+    # Mueve el borde derecho hacia la izquierda
+
+    # Salir del modo de redimensionamiento (Enter, Escape o $mod+r)
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+
+# Activar modo de redimensionamiento
+bindsym $mod+r mode "resize"
+
+#####
+# GESTIÓN DE I3WM
+#####
+
+# Recargar configuración
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Salir de i3?' -b 'Salir' 'i3-msg exit'"
+
+#####
+# BARRA DE ESTADO (i3status)
+#####
+
+bar {
+    status_command i3status -c ~/.config/i3/i3status.conf
+    position top
+    font pango:Noto Sans, FontAwesome 11
+    tray_output primary
+    tray_padding 4
+    separator_symbol "|"
+    height 23
+
+    colors {
+        background #0a0a0a
+        statusline #E6EEF3
+        separator  #2A2A2A
+
+        # Workspaces: fondo/plano; activo/focused sutil con borde/acento
+        focused_workspace  #4fc3f7 #0a0a0a #ffffff
+        active_workspace   #81c784 #0a0a0a #e0e0e0
+        inactive_workspace #0a0a0a #0a0a0a #9e9e9e
+        urgent_workspace   #ff9800 #0a0a0a #000000
+    }
+}
