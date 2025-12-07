@@ -2,6 +2,13 @@
 
 Script automatizado para transformar una instalación base de Debian 13 en un sistema completo con i3 window manager, optimizado para **Dell Inspiron 5584**.
 
+> 🚀 **¡Comienza aquí:** [QUICKSTART.md](QUICKSTART.md) - En 5 minutos!
+> 
+> 📖 **Documentación:** 
+> - [INSTALACION.md](INSTALACION.md) - Guía paso a paso de instalación
+> - [COMPATIBILIDAD.md](COMPATIBILIDAD.md) - Matriz técnica de compatibilidad con script Nvidia
+> - [INDICE.md](INDICE.md) - Índice completo de documentación
+
 ## 🖥️ Hardware Soportado
 
 **Optimizado específicamente para:**
@@ -77,6 +84,37 @@ sudo ./script-Debian13-i3wm.sh
 ```bash
 sudo reboot
 ```
+
+## 🎮 Instalación Opcional: GPU NVIDIA
+
+Si tu laptop tiene GPU NVIDIA (como MX130 en el Inspiron 5584) y deseas jugar o renderizar con ella:
+
+```bash
+# Después de completar los 4 pasos anteriores y reiniciar:
+sudo ./script-Nvidia-offload.sh
+sudo reboot
+```
+
+**Características:**
+- ✅ Instalación automática de drivers
+- ✅ Librerías 32-bit para Steam/Wine
+- ✅ Rendering offload (Intel por defecto, Nvidia bajo demanda)
+- ✅ Control automático de energía (D3 power management)
+- ✅ Compatible 100% con esta instalación
+
+**Verificación post-instalación:**
+```bash
+nvidia-smi                              # Ver GPU instalada
+nv glxinfo | grep NVIDIA               # Verificar offload rendering
+__NV_PRIME_RENDER_OFFLOAD=1 glxinfo   # Confirmar Nvidia activa
+```
+
+**Uso en Steam:**
+1. Abre Steam
+2. Click derecho en juego → Propiedades
+3. Parámetros de lanzamiento: `nv %command%`
+
+📖 Para más detalles: Ver [INSTALACION.md](INSTALACION.md) y [COMPATIBILIDAD.md](COMPATIBILIDAD.md)
 
 ## 🔧 Resolución de Problemas
 
