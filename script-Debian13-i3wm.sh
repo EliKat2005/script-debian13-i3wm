@@ -140,9 +140,9 @@ PKGS=(
   acpi udisks2 xdg-user-dirs
   
   # Servidor gráfico X11 + i3wm
-  xorg xserver-xorg xserver-xorg-input-libinput
+  xorg xserver-xorg xserver-xorg-input-libinput x11-xserver-utils
   i3-wm i3status i3lock xss-lock dunst picom
-  arandr autorandr xrandr             # Gestión de pantallas (HDMI, monitores externos)
+  arandr autorandr             # Gestión de pantallas (HDMI, monitores externos)
   lxpolkit udiskie
   lightdm lightdm-gtk-greeter
   
@@ -162,8 +162,8 @@ PKGS=(
   # Control de brillo
   light
   
-  # Archivos comprimidos
-  unzip zip p7zip-full rar unrar
+  # Archivos comprimidos (p7zip-rar para soporte RAR sin repositorio non-free)
+  unzip zip p7zip-full p7zip-rar
   tar gzip bzip2 xz-utils
   xarchiver                           # Gestor gráfico de archivos comprimidos
   
@@ -192,7 +192,7 @@ PKGS=(
   lm-sensors mesa-utils
   
   # Utilidades del sistema
-  neofetch                            # Info del sistema
+  fastfetch                           # Info del sistema (neofetch alternativo moderno)
 )
 
 # Instalar con control de fallo parcial.
