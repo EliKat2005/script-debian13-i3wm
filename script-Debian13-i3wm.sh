@@ -78,10 +78,17 @@ else
 fi
 
 log "Instalar paquetes Bluetooth requeridos (BlueZ + plugins PipeWire + ofono)"
-apt -y install bluez bluez-tools libspa-0.2-bluetooth ofono ofono-phonesim || {
+apt -y install bluez bluez-tools libspa-0.2-bluetooth ofono || {
   log "Fallo instalando paquetes bluetooth; revisa la conexión o los repos."
   exit 1
 }
+
+# Intentar instalar ofono-phonesim si está disponible (opcional, puede no existir)
+if apt-cache search ofono-phonesim | grep -q "^ofono-phonesim"; then
+  apt -y install ofono-phonesim || log "Aviso: No se pudo instalar ofono-phonesim (opcional)"
+else
+  log "Nota: ofono-phonesim no disponible en repositorios (opcional, no crítico)"
+fi
 
 # Quitar módulo de Pulseaudio Bluetooth si se instaló por accidente (conflicta con PipeWire)
 if dpkg -l | grep -q pulseaudio-module-bluetooth; then
