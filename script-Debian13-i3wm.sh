@@ -162,8 +162,8 @@ PKGS=(
   # Control de brillo
   light
   
-  # Archivos comprimidos (p7zip-rar para soporte RAR sin repositorio non-free)
-  unzip zip p7zip-full p7zip-rar
+  # Archivos comprimidos
+  unzip zip p7zip-full unrar-free
   tar gzip bzip2 xz-utils
   xarchiver                           # Gestor gráfico de archivos comprimidos
   

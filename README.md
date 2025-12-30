@@ -2,12 +2,7 @@
 
 Script automatizado para transformar una instalación base de Debian 13 en un sistema completo con i3 window manager, optimizado para **Dell Inspiron 5584**.
 
-> 🚀 **¡Comienza aquí:** [QUICKSTART.md](QUICKSTART.md) - En 5 minutos!
-> 
-> 📖 **Documentación:** 
-> - [INSTALACION.md](INSTALACION.md) - Guía paso a paso de instalación
-> - [COMPATIBILIDAD.md](COMPATIBILIDAD.md) - Matriz técnica de compatibilidad con script Nvidia
-> - [INDICE.md](INDICE.md) - Índice completo de documentación
+> � **Documentación en README.md** - Todo lo que necesitas saber
 
 ## 🖥️ Hardware Soportado
 
@@ -113,8 +108,6 @@ __NV_PRIME_RENDER_OFFLOAD=1 glxinfo   # Confirmar Nvidia activa
 1. Abre Steam
 2. Click derecho en juego → Propiedades
 3. Parámetros de lanzamiento: `nv %command%`
-
-📖 Para más detalles: Ver [INSTALACION.md](INSTALACION.md) y [COMPATIBILIDAD.md](COMPATIBILIDAD.md)
 
 ## 🔧 Resolución de Problemas
 
