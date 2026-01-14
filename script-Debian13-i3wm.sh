@@ -235,24 +235,34 @@ IOSCHED
 log "✓ I/O Scheduler configurado (none/mq-deadline para SSD)"
 
 log "6. Configurando CPU Governor (Performance)..."
-# Instalar cpufrequtils si no está presente
-if ! command -v cpufreq-set &> /dev/null; then
-    apt -y install cpufrequtils
-fi
-
-# Configurar Governor permanente
-cat > /etc/default/cpufrequtils <<'CPUFREQ'
-# CPU Governor para Athlon II X4 (+5% responsividad)
-GOVERNOR="performance"
-CPUFREQ
-log "✓ CPU Governor configurado (performance)"
-
-# Aplicar inmediatamente (si el módulo está cargado)
-if [[ -d /sys/devices/system/cpu/cpu0/cpufreq ]]; then
+# Verificar si cpufreq está disponible
+if [[ ! -d /sys/devices/system/cpu/cpu0/cpufreq ]]; then
+    warn "cpufreq no disponible en este kernel (continuando...)"
+else
+    # Aplicar governor inmediatamente
     for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
         echo "performance" > "$cpu" 2>/dev/null || true
     done
-    log "✓ Governor aplicado a todos los cores"
+    log "✓ Governor 'performance' aplicado a todos los cores"
+    
+    # Crear servicio systemd para persistir al reinicio (reemplaza cpufrequtils)
+    cat > /etc/systemd/system/cpu-governor-performance.service <<'CPUGOV'
+[Unit]
+Description=Set CPU Governor to Performance
+After=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do echo performance > "$cpu" 2>/dev/null || true; done'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+CPUGOV
+    
+    systemctl daemon-reload
+    systemctl enable cpu-governor-performance.service
+    log "✓ Servicio systemd creado (persiste al reinicio)"
 fi
 
 log "7. Optimizando GPU Radeon (Xorg)..."
