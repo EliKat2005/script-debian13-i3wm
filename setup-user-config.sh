@@ -51,7 +51,7 @@ log "Directorio home: $HOME"
 
 # Crear directorios necesarios
 log "Creando estructura de directorios..."
-for dir in "$HOME/.config/i3" "$HOME/.config/picom" "$HOME/.config/alacritty" "$HOME/Wallpapers"; do
+for dir in "$HOME/.config/i3" "$HOME/.config/i3status" "$HOME/.config/picom" "$HOME/.config/alacritty" "$HOME/Wallpapers"; do
     if mkdir -p "$dir"; then
         [[ ! -d "$dir" ]] && warn "No se pudo crear: $dir"
     fi
