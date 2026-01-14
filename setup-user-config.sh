@@ -111,6 +111,8 @@ exec --no-startup-id nm-applet
 exec --no-startup-id dunst
 exec --no-startup-id udiskie --tray
 exec --no-startup-id numlockx on
+# Arreglar cursor (sin animación de carga)
+exec --no-startup-id xsetroot -cursor_name left_ptr
 
 # --- APARIENCIA ---
 default_border pixel 2
@@ -120,6 +122,42 @@ client.focused          #005577 #005577 #ffffff #2e9ef4 #005577
 client.focused_inactive #333333 #5f676a #ffffff #484e50 #5f676a
 client.unfocused        #333333 #222222 #888888 #292d2e #222222
 client.urgent           #2f343a #900000 #ffffff #900000 #900000
+
+# --- WORKSPACES ---
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+# Cambiar a workspace
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+# Mover ventana a workspace
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # --- ATAJOS PRINCIPALES ---
 bindsym $mod+Return exec $term
@@ -179,6 +217,7 @@ bar {
         position top
         tray_output primary
         strip_workspace_numbers yes
+        font pango:Noto Sans 10
         colors {
             background #1a1a1a
             statusline #dddddd
@@ -214,16 +253,16 @@ order += "tztime local"
 order += "volume master"
 
 ethernet _first_ {
-        format_up = "E: %ip"
-        format_down = "E: down"
+        format_up = "NET: %ip"
+        format_down = "NET: down"
 }
 
 disk "/" {
-        format = "/ %avail"
+        format = "ROOT %avail"
 }
 
 disk "/home" {
-        format = "🏠 %avail"
+        format = "HOME %avail"
 }
 
 load {
@@ -231,9 +270,9 @@ load {
 }
 
 memory {
-        format = "MEM %used"
+        format = "RAM %used"
         threshold_degraded = "1G"
-        format_degraded = "MEMORY < %available"
+        format_degraded = "RAM < %available"
 }
 
 tztime local {
@@ -241,12 +280,66 @@ tztime local {
 }
 
 volume master {
-        format = "♪: %volume"
-        format_muted = "♪: muted"
+        format = "VOL: %volume"
+        format_muted = "VOL: muted"
         device = "default"
 }
 STATUS
 log "✓ i3status configurado"
+
+# ─── CONFIGURAR GTK TEMA OSCURO ───
+log "Configurando tema oscuro GTK..."
+mkdir -p "$HOME/.config/gtk-3.0"
+cat > "$HOME/.config/gtk-3.0/settings.ini" <<'GTKSETTINGS'
+[Settings]
+gtk-theme-name=Arc-Dark
+gtk-icon-theme-name=Papirus-Dark
+gtk-font-name=Noto Sans 10
+gtk-cursor-theme-name=Adwaita
+gtk-cursor-theme-size=24
+gtk-toolbar-style=GTK_TOOLBAR_BOTH
+gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+gtk-button-images=1
+gtk-menu-images=1
+gtk-enable-event-sounds=0
+gtk-enable-input-feedback-sounds=0
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle=hintfull
+gtk-xft-rgba=rgb
+gtk-application-prefer-dark-theme=1
+GTKSETTINGS
+
+# GTK2
+cat > "$HOME/.gtkrc-2.0" <<'GTKRC2'
+gtk-theme-name="Arc-Dark"
+gtk-icon-theme-name="Papirus-Dark"
+gtk-font-name="Noto Sans 10"
+gtk-cursor-theme-name="Adwaita"
+gtk-cursor-theme-size=24
+gtk-toolbar-style=GTK_TOOLBAR_BOTH
+gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR
+gtk-button-images=1
+gtk-menu-images=1
+gtk-enable-event-sounds=0
+gtk-enable-input-feedback-sounds=0
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle="hintfull"
+gtk-xft-rgba="rgb"
+GTKRC2
+log "✓ Tema oscuro GTK configurado"
+
+# ─── CONFIGURAR VARIABLES DE ENTORNO ───
+log "Configurando variables de entorno..."
+cat > "$HOME/.xsessionrc" <<'XSESSION'
+# Variables de entorno para i3
+export GTK_THEME=Arc-Dark
+export QT_QPA_PLATFORMTHEME=gtk2
+export XCURSOR_THEME=Adwaita
+export XCURSOR_SIZE=24
+XSESSION
+log "✓ Variables de entorno configuradas"
 
 # ─── RESUMEN FINAL ───
 echo ""
@@ -257,7 +350,10 @@ echo "  • $HOME/.config/i3/config"
 echo "  • $HOME/.config/i3status/config"
 echo "  • $HOME/.config/picom/picom.conf"
 echo "  • $HOME/.config/alacritty/alacritty.toml"
+echo "  • $HOME/.config/gtk-3.0/settings.ini"
+echo "  • $HOME/.gtkrc-2.0"
+echo "  • $HOME/.xsessionrc"
 echo ""
 echo "ℹ️  Los archivos anteriores fueron respaldados con extensión .bak"
-echo "ℹ️  Recarga i3 con: Mod+Shift+R"
+echo "ℹ️  Recarga i3 con: Mod+Shift+R o cierra sesión y vuelve a entrar"
 echo ""
