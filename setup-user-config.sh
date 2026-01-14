@@ -51,12 +51,40 @@ log "Directorio home: $HOME"
 
 # Crear directorios necesarios
 log "Creando estructura de directorios..."
-for dir in "$HOME/.config/i3" "$HOME/.config/i3status" "$HOME/.config/picom" "$HOME/.config/alacritty" "$HOME/Wallpapers"; do
+
+# Directorios de configuración
+for dir in "$HOME/.config/i3" "$HOME/.config/i3status" "$HOME/.config/picom" "$HOME/.config/alacritty"; do
     if mkdir -p "$dir"; then
         [[ ! -d "$dir" ]] && warn "No se pudo crear: $dir"
     fi
 done
+
+# Directorios XDG estándar del usuario
+for dir in "$HOME/Descargas" "$HOME/Documentos" "$HOME/Imágenes" "$HOME/Música" "$HOME/Vídeos" "$HOME/Escritorio" "$HOME/Plantillas" "$HOME/Público" "$HOME/Wallpapers"; do
+    mkdir -p "$dir" 2>/dev/null
+done
+
 log "✓ Directorios creados"
+
+# Configurar XDG user dirs
+log "Configurando directorios XDG..."
+cat > "$HOME/.config/user-dirs.dirs" <<'XDGDIRS'
+XDG_DESKTOP_DIR="$HOME/Escritorio"
+XDG_DOWNLOAD_DIR="$HOME/Descargas"
+XDG_TEMPLATES_DIR="$HOME/Plantillas"
+XDG_PUBLICSHARE_DIR="$HOME/Público"
+XDG_DOCUMENTS_DIR="$HOME/Documentos"
+XDG_MUSIC_DIR="$HOME/Música"
+XDG_PICTURES_DIR="$HOME/Imágenes"
+XDG_VIDEOS_DIR="$HOME/Vídeos"
+XDGDIRS
+
+# Deshabilitar actualización automática de directorios
+cat > "$HOME/.config/user-dirs.conf" <<'XDGCONF'
+enabled=False
+XDGCONF
+
+log "✓ Directorios XDG configurados"
 
 # ─── PICOM (Rendimiento Extremo) ───
 log "Configurando Picom..."
@@ -345,7 +373,16 @@ log "✓ Variables de entorno configuradas"
 echo ""
 log "✅ Configuración de usuario completada con éxito"
 echo ""
-echo "Archivos creados:"
+echo "Directorios XDG creados:"
+echo "  • $HOME/Descargas"
+echo "  • $HOME/Documentos"
+echo "  • $HOME/Imágenes"
+echo "  • $HOME/Música"
+echo "  • $HOME/Vídeos"
+echo "  • $HOME/Escritorio"
+echo "  • $HOME/Wallpapers"
+echo ""
+echo "Archivos de configuración creados:"
 echo "  • $HOME/.config/i3/config"
 echo "  • $HOME/.config/i3status/config"
 echo "  • $HOME/.config/picom/picom.conf"
@@ -353,6 +390,7 @@ echo "  • $HOME/.config/alacritty/alacritty.toml"
 echo "  • $HOME/.config/gtk-3.0/settings.ini"
 echo "  • $HOME/.gtkrc-2.0"
 echo "  • $HOME/.xsessionrc"
+echo "  • $HOME/.config/user-dirs.dirs"
 echo ""
 echo "ℹ️  Los archivos anteriores fueron respaldados con extensión .bak"
 echo "ℹ️  Recarga i3 con: Mod+Shift+R o cierra sesión y vuelve a entrar"
