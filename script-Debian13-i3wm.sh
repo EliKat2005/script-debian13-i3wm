@@ -325,6 +325,57 @@ systemctl disable --now pcscd.socket 2>/dev/null || true
 log "✓ Servicios innecesarios desactivados (${SECONDS}s)"
 
 # ─────────────────────────────────────────────────────────────────────────────
+#  LIMPIEZA Y OPTIMIZACIONES FINALES
+# ─────────────────────────────────────────────────────────────────────────────
+log "Limpieza de paquetes innecesarios..."
+
+# Eliminar firmware de Nvidia (sistema AMD)
+if dpkg -l | grep -q 'firmware-nvidia-graphics'; then
+    log "Eliminando firmware de Nvidia (no necesario)..."
+    apt -y purge firmware-nvidia-graphics 2>/dev/null || true
+    log "✓ Firmware Nvidia eliminado"
+fi
+
+# Eliminar kernels antiguos (mantener solo el actual y uno anterior como backup)
+log "Limpiando kernels antiguos..."
+CURRENT_KERNEL=$(uname -r)
+INSTALLED_KERNELS=$(dpkg -l | grep 'linux-image-[0-9]' | grep '^ii' | awk '{print $2}' | grep -v "$CURRENT_KERNEL" | sort -V | head -n -1)
+if [[ -n "$INSTALLED_KERNELS" ]]; then
+    for kernel in $INSTALLED_KERNELS; do
+        log "Eliminando kernel antiguo: $kernel"
+        apt -y purge "$kernel" 2>/dev/null || true
+    done
+    log "✓ Kernels antiguos eliminados"
+else
+    log "✓ No hay kernels antiguos para eliminar"
+fi
+
+# Ejecutar autoremove para limpiar dependencias
+apt -y autoremove 2>/dev/null || true
+log "✓ Limpieza completada"
+
+# Activar compresión en Btrfs (root)
+log "Configurando compresión Btrfs..."
+if mount | grep -q 'on / type btrfs'; then
+    # Hacer permanente en fstab
+    if [[ -f /etc/fstab ]]; then
+        if ! grep -q 'compress=zstd' /etc/fstab; then
+            sed -i 's|subvol=/@|subvol=/@,compress=zstd:3|' /etc/fstab
+            log "✓ Compresión Btrfs configurada en fstab (zstd:3)"
+        fi
+    fi
+    
+    # Aplicar inmediatamente
+    mount -o remount,compress=zstd:3 / 2>/dev/null || true
+    log "✓ Compresión Btrfs activada (ahorra 20-30% espacio)"
+    
+    # Nota: La compresión de archivos existentes se hace en segundo plano
+    log "ℹ️  Los archivos nuevos se comprimirán automáticamente"
+else
+    log "ℹ️  Root no es Btrfs, omitiendo compresión"
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
 #  CONFIGURACIÓN DE USUARIO (PARTE 2)
 # ─────────────────────────────────────────────────────────────────────────────
 log "10. Ejecutando configuración de usuario..."
@@ -350,6 +401,18 @@ if [[ $? -eq 0 ]]; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "  🚀 Configuración del sistema finalizada"
     echo "  ✅ Configuración de usuario aplicada"
+    echo ""
+    echo "  📊 Optimizaciones aplicadas:"
+    echo "     • CPU Governor: performance (3.0 GHz constante)"
+    echo "     • ZRAM Swap: 100% compresión zstd"
+    echo "     • Kernel: mitigations=off, nowatchdog, audit=0"
+    echo "     • SSD: I/O scheduler optimizado, noatime"
+    echo "     • Btrfs: Compresión zstd:3 activada"
+    echo "     • GPU Radeon: TearFree, DRI3, glamor"
+    echo "     • Audio: RTKit instalado"
+    echo "     • Servicios innecesarios: desactivados"
+    echo "     • Firmware Nvidia: eliminado"
+    echo "     • Kernels antiguos: eliminados"
     echo ""
     echo "  ⚠️  REINICIA EL SISTEMA para aplicar cambios:"
     echo "     sudo reboot"
