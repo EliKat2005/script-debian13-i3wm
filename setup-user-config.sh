@@ -265,24 +265,36 @@ backup_if_exists "$HOME/.config/i3status/config"
 cat > "$HOME/.config/i3status/config" <<'STATUS'
 general {
         colors = true
-        interval = 5
+        interval = 2
         color_good = "#00FF00"
         color_degraded = "#FFFF00"
         color_bad = "#FF0000"
 }
 
-# Auto-detecta la primera interfaz cableada
+order += "cpu_usage"
+order += "cpu_temperature 0"
 order += "ethernet _first_"
 order += "disk /"
 order += "disk /home"
-order += "load"
 order += "memory"
 order += "tztime local"
 order += "volume master"
 
+cpu_usage {
+        format = "CPU %usage"
+        degraded_threshold = 80
+        max_threshold = 95
+}
+
+cpu_temperature 0 {
+        format = "TEMP %degrees°C"
+        path = "/sys/class/thermal/thermal_zone0/temp"
+        max_threshold = 75
+}
+
 ethernet _first_ {
-        format_up = "NET: %ip"
-        format_down = "NET: down"
+        format_up = "NET %ip"
+        format_down = "NET down"
 }
 
 disk "/" {
@@ -291,10 +303,6 @@ disk "/" {
 
 disk "/home" {
         format = "HOME %avail"
-}
-
-load {
-        format = "CPU %1min"
 }
 
 memory {
@@ -308,8 +316,8 @@ tztime local {
 }
 
 volume master {
-        format = "VOL: %volume"
-        format_muted = "VOL: muted"
+        format = "VOL %volume"
+        format_muted = "VOL muted"
         device = "default"
 }
 STATUS

@@ -113,7 +113,7 @@ PKGS=(
   lxappearance papirus-icon-theme arc-theme fonts-noto-core fonts-font-awesome
   
   # Aplicaciones
-  alacritty lxterminal
+  alacritty
   pcmanfm gvfs gvfs-backends udisks2 udiskie
   chromium mpv zathura
   feh                   # Gestor de fondo de pantalla
@@ -127,8 +127,8 @@ PKGS=(
   wget curl git unzip p7zip-full btop fastfetch
   zram-tools
   
-  # Login Manager
-  lightdm lightdm-gtk-greeter
+  # Login Manager (TUI, más ligero que lightdm)
+  greetd greetd-tuigreet
 )
 if apt -y --no-install-recommends install "${PKGS[@]}"; then
     log "✓ Paquetes base instalados (${#PKGS[@]} paquetes)"
@@ -136,6 +136,22 @@ else
     error "Fallo al instalar paquetes base"
     exit 1
 fi
+
+# Configurar greetd con tuigreet (login TUI ligero)
+log "Configurando greetd (login TUI)..."
+mkdir -p /etc/greetd
+cat > /etc/greetd/config.toml <<'GREETDCONF'
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --time --remember --remember-session --cmd i3"
+user = "greeter"
+GREETDCONF
+
+# Habilitar greetd
+systemctl enable greetd.service
+log "✓ greetd configurado (TUI login, inicia i3 directamente)"
 
 log "5. Optimizando Kernel (Mitigations OFF + Swap)..."
 # Backup de GRUB config
