@@ -345,6 +345,22 @@ log "✓ Servicios innecesarios desactivados (${SECONDS}s)"
 # ─────────────────────────────────────────────────────────────────────────────
 log "Limpieza de paquetes innecesarios..."
 
+# Eliminar lightdm (usamos greetd en su lugar)
+if dpkg -l | grep -q 'lightdm'; then
+    log "Eliminando lightdm (reemplazado por greetd)..."
+    systemctl disable lightdm.service 2>/dev/null || true
+    systemctl stop lightdm.service 2>/dev/null || true
+    apt -y purge lightdm lightdm-gtk-greeter liblightdm-gobject-1-0 2>/dev/null || true
+    log "✓ lightdm eliminado"
+fi
+
+# Eliminar lxterminal (usamos alacritty)
+if dpkg -l | grep -q 'lxterminal'; then
+    log "Eliminando lxterminal (usamos alacritty)..."
+    apt -y purge lxterminal 2>/dev/null || true
+    log "✓ lxterminal eliminado"
+fi
+
 # Eliminar firmware de Nvidia (sistema AMD)
 if dpkg -l | grep -q 'firmware-nvidia-graphics'; then
     log "Eliminando firmware de Nvidia (no necesario)..."
@@ -419,16 +435,17 @@ if [[ $? -eq 0 ]]; then
     echo "  ✅ Configuración de usuario aplicada"
     echo ""
     echo "  📊 Optimizaciones aplicadas:"
+    echo "     • Login: greetd+tuigreet (TUI, instantáneo)"
+    echo "     • Terminal: alacritty (GPU-acelerado)"
     echo "     • CPU Governor: performance (3.0 GHz constante)"
     echo "     • ZRAM Swap: 100% compresión zstd"
     echo "     • Kernel: mitigations=off, nowatchdog, audit=0"
     echo "     • SSD: I/O scheduler optimizado, noatime"
     echo "     • Btrfs: Compresión zstd:3 activada"
     echo "     • GPU Radeon: TearFree, DRI3, glamor"
-    echo "     • Audio: RTKit instalado"
+    echo "     • Audio: RTKit para realtime"
     echo "     • Servicios innecesarios: desactivados"
-    echo "     • Firmware Nvidia: eliminado"
-    echo "     • Kernels antiguos: eliminados"
+    echo "     • Limpieza: lightdm, lxterminal, Nvidia, kernels viejos"
     echo ""
     echo "  ⚠️  REINICIA EL SISTEMA para aplicar cambios:"
     echo "     sudo reboot"
