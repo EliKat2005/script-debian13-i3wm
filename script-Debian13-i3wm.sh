@@ -140,6 +140,13 @@ fi
 # Configurar greetd con tuigreet (login TUI ligero)
 log "Configurando greetd (login TUI)..."
 mkdir -p /etc/greetd
+
+# Crear usuario greeter si no existe
+if ! id greeter &>/dev/null; then
+    useradd -r -s /usr/sbin/nologin -d /var/lib/greetd -M greeter
+    log "✓ Usuario greeter creado"
+fi
+
 cat > /etc/greetd/config.toml <<'GREETDCONF'
 [terminal]
 vt = 1
