@@ -342,6 +342,23 @@ if dpkg -l | grep -q 'greetd\|tuigreet\|lxterminal'; then
     log "✓ Paquetes obsoletos eliminados"
 fi
 
+# Eliminar usuario greeter residual (si existe)
+if getent passwd greeter &>/dev/null; then
+    log "Eliminando usuario greeter residual..."
+    userdel -r greeter 2>/dev/null || true
+    log "✓ Usuario greeter eliminado"
+fi
+
+# Purgar paquetes con configuraciones residuales (estado rc)
+log "Limpiando configuraciones residuales..."
+RC_PKGS=$(dpkg -l | grep "^rc" | awk '{print $2}')
+if [[ -n "$RC_PKGS" ]]; then
+    dpkg --purge $RC_PKGS 2>/dev/null || true
+    log "✓ Configuraciones residuales purgadas"
+else
+    log "✓ Sin configuraciones residuales"
+fi
+
 # Eliminar firmware de Nvidia (sistema AMD)
 if dpkg -l | grep -q 'firmware-nvidia-graphics'; then
     log "Eliminando firmware de Nvidia (no necesario)..."
