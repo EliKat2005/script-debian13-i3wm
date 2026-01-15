@@ -113,7 +113,7 @@ PKGS=(
   lxappearance papirus-icon-theme arc-theme fonts-noto-core fonts-font-awesome
   
   # Aplicaciones
-  alacritty
+  alacritty             # Terminal GPU-acelerado (NO lxterminal)
   pcmanfm gvfs gvfs-backends udisks2 udiskie
   chromium mpv zathura
   feh                   # Gestor de fondo de pantalla
@@ -127,8 +127,8 @@ PKGS=(
   wget curl git unzip p7zip-full btop fastfetch
   zram-tools
   
-  # Login Manager (TUI, más ligero que lightdm)
-  greetd greetd-tuigreet
+  # Login Manager (TUI, NO lightdm)
+  greetd tuigreet
 )
 if apt -y --no-install-recommends install "${PKGS[@]}"; then
     log "✓ Paquetes base instalados (${#PKGS[@]} paquetes)"
@@ -345,20 +345,13 @@ log "✓ Servicios innecesarios desactivados (${SECONDS}s)"
 # ─────────────────────────────────────────────────────────────────────────────
 log "Limpieza de paquetes innecesarios..."
 
-# Eliminar lightdm (usamos greetd en su lugar)
-if dpkg -l | grep -q 'lightdm'; then
-    log "Eliminando lightdm (reemplazado por greetd)..."
+# Eliminar lightdm/lxterminal si existen (en caso de actualización desde versión vieja)
+if dpkg -l | grep -q 'lightdm\|lxterminal'; then
+    log "Limpiando paquetes obsoletos (lightdm/lxterminal)..."
     systemctl disable lightdm.service 2>/dev/null || true
     systemctl stop lightdm.service 2>/dev/null || true
-    apt -y purge lightdm lightdm-gtk-greeter liblightdm-gobject-1-0 2>/dev/null || true
-    log "✓ lightdm eliminado"
-fi
-
-# Eliminar lxterminal (usamos alacritty)
-if dpkg -l | grep -q 'lxterminal'; then
-    log "Eliminando lxterminal (usamos alacritty)..."
-    apt -y purge lxterminal 2>/dev/null || true
-    log "✓ lxterminal eliminado"
+    apt -y purge lightdm lightdm-gtk-greeter liblightdm-gobject-1-0 lxterminal 2>/dev/null || true
+    log "✓ Paquetes obsoletos eliminados"
 fi
 
 # Eliminar firmware de Nvidia (sistema AMD)
