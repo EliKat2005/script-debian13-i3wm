@@ -121,6 +121,7 @@ PKGS=(
   
   # Audio
   pipewire pipewire-pulse wireplumber pavucontrol pulseaudio-utils
+  rtkit                 # Real-time scheduling para audio
   
   # Utilidades Sistema
   wget curl git unzip p7zip-full btop fastfetch
