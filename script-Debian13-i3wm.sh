@@ -127,8 +127,8 @@ PKGS=(
   wget curl git unzip p7zip-full btop fastfetch
   zram-tools
   
-  # Login Manager (TUI, NO lightdm)
-  greetd tuigreet
+  # Login Manager (lightdm más compatible que greetd en Debian 13)
+  lightdm lightdm-gtk-greeter
 )
 if apt -y --no-install-recommends install "${PKGS[@]}"; then
     log "✓ Paquetes base instalados (${#PKGS[@]} paquetes)"
@@ -137,28 +137,10 @@ else
     exit 1
 fi
 
-# Configurar greetd con tuigreet (login TUI ligero)
-log "Configurando greetd (login TUI)..."
-mkdir -p /etc/greetd
-
-# Crear usuario greeter si no existe
-if ! id greeter &>/dev/null; then
-    useradd -r -s /usr/sbin/nologin -d /var/lib/greetd -M greeter
-    log "✓ Usuario greeter creado"
-fi
-
-cat > /etc/greetd/config.toml <<'GREETDCONF'
-[terminal]
-vt = 1
-
-[default_session]
-command = "tuigreet --time --remember --remember-session --cmd i3"
-user = "greeter"
-GREETDCONF
-
-# Habilitar greetd
-systemctl enable greetd.service
-log "✓ greetd configurado (TUI login, inicia i3 directamente)"
+# Configurar lightdm con autologin opcional
+log "Configurando lightdm..."
+# lightdm se habilita automáticamente durante la instalación
+log "✓ lightdm configurado (login gráfico GTK)"
 
 log "5. Optimizando Kernel (Mitigations OFF + Swap)..."
 # Backup de GRUB config
@@ -352,12 +334,11 @@ log "✓ Servicios innecesarios desactivados (${SECONDS}s)"
 # ─────────────────────────────────────────────────────────────────────────────
 log "Limpieza de paquetes innecesarios..."
 
-# Eliminar lightdm/lxterminal si existen (en caso de actualización desde versión vieja)
-if dpkg -l | grep -q 'lightdm\|lxterminal'; then
-    log "Limpiando paquetes obsoletos (lightdm/lxterminal)..."
-    systemctl disable lightdm.service 2>/dev/null || true
-    systemctl stop lightdm.service 2>/dev/null || true
-    apt -y purge lightdm lightdm-gtk-greeter liblightdm-gobject-1-0 lxterminal 2>/dev/null || true
+# Eliminar paquetes obsoletos si existen (greetd/tuigreet tienen problemas en Debian 13)
+if dpkg -l | grep -q 'greetd\|tuigreet\|lxterminal'; then
+    log "Limpiando paquetes obsoletos..."
+    systemctl disable greetd.service 2>/dev/null || true
+    apt -y purge greetd tuigreet lxterminal 2>/dev/null || true
     log "✓ Paquetes obsoletos eliminados"
 fi
 
@@ -435,7 +416,7 @@ if [[ $? -eq 0 ]]; then
     echo "  ✅ Configuración de usuario aplicada"
     echo ""
     echo "  📊 Optimizaciones aplicadas:"
-    echo "     • Login: greetd+tuigreet (TUI, instantáneo)"
+    echo "     • Login: lightdm (GTK greeter estable)"
     echo "     • Terminal: alacritty (GPU-acelerado)"
     echo "     • CPU Governor: performance (3.0 GHz constante)"
     echo "     • ZRAM Swap: 100% compresión zstd"
@@ -445,7 +426,7 @@ if [[ $? -eq 0 ]]; then
     echo "     • GPU Radeon: TearFree, DRI3, glamor"
     echo "     • Audio: RTKit para realtime"
     echo "     • Servicios innecesarios: desactivados"
-    echo "     • Limpieza: lightdm, lxterminal, Nvidia, kernels viejos"
+    echo "     • Limpieza: greetd/tuigreet, lxterminal, Nvidia, kernels viejos"
     echo ""
     echo "  ⚠️  REINICIA EL SISTEMA para aplicar cambios:"
     echo "     sudo reboot"
