@@ -77,8 +77,7 @@ Todo está en este README. Los archivos antiguos de documentación fueron elimin
 **Entorno Gráfico:**
 - i3wm (gestor de ventanas ultra ligero)
 - dmenu (lanzador de apps)
-- alacritty + lxterminal (terminales)
-- picom (compositor mínimo para vsync)
+- alacritty (terminal GPU-acelerado)
 
 **Apps Diarias:**
 - Chromium (navegador)
@@ -273,8 +272,7 @@ Este script usa optimizaciones agresivas para máximo rendimiento:
 ~/.config/i3/config                     → Config i3wm
 ~/.config/i3status/config               → Barra superior
 ~/.config/alacritty/alacritty.toml      → Terminal
-~/.config/picom/picom.conf              → Compositor
-/etc/X11/xorg.conf.d/20-radeon.conf     → GPU
+/etc/X11/xorg.conf.d/20-radeon.conf     → GPU (TearFree activo)
 /etc/default/grub                       → Kernel boot
 /etc/default/zramswap                   → RAM comprimida
 /etc/default/cpufrequtils               → CPU governor

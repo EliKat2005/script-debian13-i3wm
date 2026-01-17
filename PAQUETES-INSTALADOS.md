@@ -33,9 +33,9 @@ Hardware: AMD Athlon II X4, 8GB RAM, SSD
 - `i3lock` (bloqueador de pantalla)
 - `dmenu` (lanzador de aplicaciones)
 - `dunst` (notificaciones)
-- `picom` (compositor, transparencias)
 - `arandr` (configuración de monitores)
 - `numlockx` (activar teclado numérico)
+- **Nota**: No se usa compositor (TearFree en driver Radeon)
 
 ### Login Manager (ACTUAL)
 - `lightdm` + `lightdm-gtk-greeter` (~80MB RAM, login gráfico)

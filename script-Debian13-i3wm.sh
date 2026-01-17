@@ -104,7 +104,7 @@ log "4. Instalando Entorno Base y Estética Debian..."
 PKGS=(
   # Base X11 y i3
   xorg xserver-xorg xinit x11-xserver-utils
-  i3-wm i3status i3lock dmenu dunst picom arandr
+  i3-wm i3status i3lock dmenu dunst arandr
   numlockx              # Activar teclado numérico en login
   
   # Estética Debian Nativa

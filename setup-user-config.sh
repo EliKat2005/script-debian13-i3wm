@@ -53,7 +53,7 @@ log "Directorio home: $HOME"
 log "Creando estructura de directorios..."
 
 # Directorios de configuración
-for dir in "$HOME/.config/i3" "$HOME/.config/i3status" "$HOME/.config/picom" "$HOME/.config/alacritty"; do
+for dir in "$HOME/.config/i3" "$HOME/.config/i3status" "$HOME/.config/alacritty"; do
     if mkdir -p "$dir"; then
         [[ ! -d "$dir" ]] && warn "No se pudo crear: $dir"
     fi
@@ -85,20 +85,6 @@ enabled=False
 XDGCONF
 
 log "✓ Directorios XDG configurados"
-
-# ─── PICOM (Rendimiento Extremo) ───
-log "Configurando Picom..."
-backup_if_exists "$HOME/.config/picom/picom.conf"
-cat > "$HOME/.config/picom/picom.conf" <<'PICOM'
-backend = "glx";
-vsync = true;
-glx-no-stencil = true;
-glx-copy-from-front = false;
-shadow = false;
-fading = false;
-unredir-if-possible = true;
-PICOM
-log "✓ Picom configurado"
 
 # ─── ALACRITTY ───
 log "Configurando Alacritty..."
@@ -133,7 +119,6 @@ floating_modifier $mod
 
 # --- INICIO AUTOMÁTICO ---
 exec --no-startup-id /usr/local/bin/monitor-setup
-exec --no-startup-id picom -b
 exec --no-startup-id feh --bg-fill /usr/share/images/desktop-base/default
 exec --no-startup-id nm-applet
 exec --no-startup-id dunst
@@ -393,7 +378,7 @@ echo ""
 echo "Archivos de configuración creados:"
 echo "  • $HOME/.config/i3/config"
 echo "  • $HOME/.config/i3status/config"
-echo "  • $HOME/.config/picom/picom.conf"
+
 echo "  • $HOME/.config/alacritty/alacritty.toml"
 echo "  • $HOME/.config/gtk-3.0/settings.ini"
 echo "  • $HOME/.gtkrc-2.0"
