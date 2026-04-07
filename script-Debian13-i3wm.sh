@@ -93,7 +93,7 @@ else
 fi
 
 log "3. Instalando Drivers AMD y Microcódigo..."
-if apt -y install firmware-linux-nonfree firmware-misc-nonfree firmware-amd-graphics amd64-microcode libgl1-mesa-dri mesa-vulkan-drivers mesa-utils; then
+if apt -y install firmware-linux-nonfree firmware-misc-nonfree firmware-amd-graphics amd64-microcode libgl1-mesa-dri mesa-va-drivers mesa-utils; then
     log "✓ Firmware y drivers AMD instalados"
 else
     error "Fallo al instalar firmware AMD"
@@ -110,12 +110,12 @@ PKGS=(
   # Estética Debian Nativa
   desktop-base
   grub-theme-starfield
-  lxappearance papirus-icon-theme arc-theme fonts-noto-core fonts-font-awesome
+  lxappearance papirus-icon-theme arc-theme fonts-noto-core fonts-font-awesome fonts-jetbrains-mono
   
   # Aplicaciones
   alacritty             # Terminal GPU-acelerado (NO lxterminal)
   pcmanfm gvfs gvfs-backends udisks2 udiskie
-  chromium mpv zathura
+  mpv zathura timeshift
   feh                   # Gestor de fondo de pantalla
   scrot                 # Capturas de pantalla
   
@@ -127,7 +127,7 @@ PKGS=(
   wget curl git unzip p7zip-full btop fastfetch
   zram-tools
   
-  # Login Manager (lightdm más compatible que greetd en Debian 13)
+  # Login Manager
   lightdm lightdm-gtk-greeter
 )
 if apt -y --no-install-recommends install "${PKGS[@]}"; then
@@ -137,10 +137,17 @@ else
     exit 1
 fi
 
-# Configurar lightdm con autologin opcional
+# Configurar lightdm 
 log "Configurando lightdm..."
 # lightdm se habilita automáticamente durante la instalación
 log "✓ lightdm configurado (login gráfico GTK)"
+
+log "Instalando Brave Browser (reemplazando a Chromium)..."
+if curl -fsS https://dl.brave.com/install.sh | sh; then
+    log "✓ Brave Browser instalado correctamente"
+else
+    warn "Fallo al instalar Brave Browser por script"
+fi
 
 log "5. Optimizando Kernel (Mitigations OFF + Swap)..."
 # Backup de GRUB config
@@ -151,8 +158,9 @@ fi
 # mitigations=off: +Rendimiento en Athlon II
 # nowatchdog: -Interrupciones
 # audit=0: Desactiva subsistema de auditoría (+1-2% overhead)
-if sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off nowatchdog audit=0"/' /etc/default/grub; then
-    log "✓ Parámetros de kernel configurados (mitigations=off, nowatchdog, audit=0)"
+# radeon.dpm=1: Activa profile dinámico de energía en GPU Radeon antigua
+if sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="quiet mitigations=off nowatchdog audit=0 radeon.dpm=1"/' /etc/default/grub; then
+    log "✓ Parámetros de kernel configurados (mitigations=off, nowatchdog, audit=0, radeon.dpm=1)"
 fi
 
 # Aplicar tema de Debian al GRUB
@@ -210,6 +218,8 @@ cat > /etc/sysctl.d/99-v12-optim.conf <<'SYSCTL'
 # Optimizaciones para Athlon II X4 con 8GB RAM + SSD
 vm.swappiness = 100
 vm.vfs_cache_pressure = 50
+# Desactiva lectura anticipada en swap (+rendimiento ZRAM)
+vm.page-cluster = 0
 # Optimizaciones SSD/RAM (+3% fluency)
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
@@ -228,6 +238,12 @@ if [[ -f /etc/fstab ]]; then
     if ! grep -q "^tmpfs /tmp" /etc/fstab; then
         echo "tmpfs /tmp tmpfs defaults,noatime,nosuid,nodev,noexec,mode=1777,size=2G 0 0" >> /etc/fstab
         log "✓ tmpfs configurado para /tmp (2GB en RAM)"
+    fi
+    
+    # Optimización XFS (home, proyectos, juegos, respaldos)
+    if grep -q "xfs" /etc/fstab; then
+        sed -i '/xfs/ s/defaults/defaults,noatime,inode64/' /etc/fstab
+        log "✓ Optimización XFS aplicada (noatime, inode64)"
     fi
 fi
 
@@ -279,15 +295,16 @@ Section "Device"
     Driver "radeon"
     Option "TearFree" "on"
     Option "DRI" "3"
-    Option "AccelMethod" "glamor"
+    Option "AccelMethod" "EXA"
+    Option "MigrationHeuristic" "greedy"
 EndSection
 EOF
 
-log "8. Script Monitor VGA 75Hz..."
+log "8. Script Monitor VGA"
 tee /usr/local/bin/monitor-setup > /dev/null <<'EOF'
 #!/bin/sh
-# Intenta forzar 75Hz si es posible, si no, usa auto
-xrandr --output VGA-0 --auto --rate 75 2>/dev/null || xrandr --output VGA-0 --auto
+# Ajuste preciso para LG L192WS 1440x900 @ 60Hz
+xrandr --output VGA-0 --mode 1440x900 --rate 60 2>/dev/null || xrandr --output VGA-0 --auto
 EOF
 chmod +x /usr/local/bin/monitor-setup
 
@@ -303,7 +320,7 @@ systemctl disable --now avahi-daemon.service 2>/dev/null || true
 systemctl disable --now avahi-daemon.socket 2>/dev/null || true
 systemctl mask avahi-daemon.service 2>/dev/null || true
 
-# Impresoras (Si no las usas)
+# Impresoras 
 systemctl disable --now cups.service 2>/dev/null || true
 systemctl disable --now cups-browsed.service 2>/dev/null || true
 systemctl disable --now cups.socket 2>/dev/null || true
@@ -384,8 +401,9 @@ fi
 apt -y autoremove 2>/dev/null || true
 log "✓ Limpieza completada"
 
-# Activar compresión en Btrfs (root)
-log "Configurando compresión Btrfs..."
+# Activar compresión en Btrfs y mantenimiento SSD (TRIM)
+log "Configurando compresión Btrfs y TRIM..."
+systemctl enable fstrim.timer 2>/dev/null || true
 if mount | grep -q 'on / type btrfs'; then
     # Hacer permanente en fstab
     if [[ -f /etc/fstab ]]; then
@@ -405,51 +423,30 @@ else
     log "ℹ️  Root no es Btrfs, omitiendo compresión"
 fi
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  CONFIGURACIÓN DE USUARIO (PARTE 2)
-# ─────────────────────────────────────────────────────────────────────────────
-log "10. Ejecutando configuración de usuario..."
-
-# Verificar que existe el script de usuario
-USER_SCRIPT="$SCRIPT_DIR/setup-user-config.sh"
-if [[ ! -f "$USER_SCRIPT" ]]; then
-    echo "❌ ERROR: No se encuentra $USER_SCRIPT"
-    echo "ℹ️  Asegúrate de que ambos scripts estén en el mismo directorio"
-    exit 1
-fi
-
-# Hacer ejecutable el script de usuario
-chmod +x "$USER_SCRIPT"
-
-# Ejecutar como el usuario (sin sudo)
-log "Aplicando dotfiles para $USER_NAME..."
-sudo -u "$USER_NAME" -H bash "$USER_SCRIPT"
-
-if [[ $? -eq 0 ]]; then
-    log "✅ INSTALACIÓN COMPLETADA CON ÉXITO"
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "  🚀 Configuración del sistema finalizada"
-    echo "  ✅ Configuración de usuario aplicada"
-    echo ""
-    echo "  📊 Optimizaciones aplicadas:"
-    echo "     • Login: lightdm (GTK greeter estable)"
-    echo "     • Terminal: alacritty (GPU-acelerado)"
-    echo "     • CPU Governor: performance (3.0 GHz constante)"
-    echo "     • ZRAM Swap: 100% compresión zstd"
-    echo "     • Kernel: mitigations=off, nowatchdog, audit=0"
-    echo "     • SSD: I/O scheduler optimizado, noatime"
-    echo "     • Btrfs: Compresión zstd:3 activada"
-    echo "     • GPU Radeon: TearFree, DRI3, glamor"
-    echo "     • Audio: RTKit para realtime"
-    echo "     • Servicios innecesarios: desactivados"
-    echo "     • Limpieza: greetd/tuigreet, lxterminal, Nvidia, kernels viejos"
-    echo ""
-    echo "  ⚠️  REINICIA EL SISTEMA para aplicar cambios:"
-    echo "     sudo reboot"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo ""
-else
-    echo "❌ ERROR: La configuración de usuario falló"
-    exit 1
-fi
+log "✅ INSTALACIÓN DEL SISTEMA COMPLETADA CON ÉXITO"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  🚀 Configuración del sistema finalizada"
+echo ""
+echo "  ⏳ SIGUIENTE PASO:"
+echo "     Asegúrate de ejecutar el script de usuario indicando tus dotfiles (SIN sudo):"
+echo "     bash setup-user-config.sh"
+echo ""
+echo "  📊 Optimizaciones aplicadas:"
+echo "     • Login: lightdm (GTK greeter estable)"
+echo "     • Terminal: alacritty (GPU-acelerado)"
+echo "     • Navegador: Brave Browser (instalación oficial)"
+echo "     • CPU Governor: performance (3.0 GHz constante)"
+echo "     • ZRAM Swap: 100% compresión zstd"
+echo "     • Kernel: mitigations=off, nowatchdog, audit=0, radeon.dpm=1"
+echo "     • SSD: I/O scheduler optimizado, noatime"
+echo "     • Sistemas de archivos: Compresión Btrfs, optimización XFS, auto fstrim"
+echo "     • GPU Radeon: TearFree, DRI3, aceleración EXA"
+echo "     • Audio: RTKit para realtime"
+echo "     • Servicios innecesarios: desactivados"
+echo "     • Limpieza: greetd/tuigreet, lxterminal, Nvidia, kernels viejos"
+echo ""
+echo "  ⚠️  RECUERDA REINICIAR el sistema luego de ejecutar la parte 2:"
+echo "     sudo reboot"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""

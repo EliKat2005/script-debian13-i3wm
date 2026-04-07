@@ -1,8 +1,8 @@
 # 📦 Análisis de Paquetes Instalados (879 total)
 
 Sistema: **Debian 13 Trixie** con i3wm  
-Fecha: 14 de enero de 2026  
-Hardware: AMD Athlon II X4, 8GB RAM, SSD
+Fecha: 7 de abril de 2026  
+Hardware: AMD Athlon II X4 640 @ 3.0GHz, 8GB RAM, BTRFS/XFS
 
 ---
 
@@ -35,7 +35,7 @@ Hardware: AMD Athlon II X4, 8GB RAM, SSD
 - `dunst` (notificaciones)
 - `arandr` (configuración de monitores)
 - `numlockx` (activar teclado numérico)
-- **Nota**: No se usa compositor (TearFree en driver Radeon)
+- **Nota**: No se usa compositor (ni picom ni opciones similares, para no sobrecargar la GPU) y el TearFree lo maneja el driver Radeon (EXA).
 
 ### Login Manager (ACTUAL)
 - `lightdm` + `lightdm-gtk-greeter` (~80MB RAM, login gráfico)
@@ -67,7 +67,7 @@ Hardware: AMD Athlon II X4, 8GB RAM, SSD
 - `lxterminal` ⚠️ **REDUNDANTE** (puede eliminarse)
 
 ### Navegadores
-- `chromium` + `chromium-common` ✅
+- `brave-browser` (instalado oficialmente con banderas VA-API habilitadas automáticamente) ✅
 
 ### Gestores de Archivos
 - `pcmanfm` (gestor ligero con GTK) ✅
@@ -103,13 +103,13 @@ Hardware: AMD Athlon II X4, 8GB RAM, SSD
 
 ## 🎮 **DRIVERS Y FIRMWARE**
 
-### AMD Graphics (529 paquetes)
+### AMD Graphics
 - `firmware-amd-graphics` (firmware GPU)
 - `amd64-microcode` (microcódigo CPU)
 - `libgl1-mesa-dri` (OpenGL)
-- `mesa-vulkan-drivers` (Vulkan)
+- `mesa-va-drivers` (VA-API Video decoders)
 - `mesa-utils` (herramientas)
-- **Nota**: Los 529 paquetes son librerías Mesa (OpenGL/Vulkan)
+- **Nota**: El paquete de `vulkan` fue purgado intencionalmente porque Radeon HD 3000 NO lo soporta.
 
 ### Firmware Adicional (7 paquetes)
 - `firmware-linux-nonfree`
@@ -181,7 +181,7 @@ Hardware: AMD Athlon II X4, 8GB RAM, SSD
 | Sistema Base | ~200 | ~1.5GB | Esencial |
 | Mesa/AMD Graphics | 529 | ~300MB | OpenGL/Vulkan |
 | X11 + i3wm | 27 | ~80MB | Entorno gráfico |
-| Aplicaciones | 15 | ~500MB | Chromium es el mayor |
+| Aplicaciones | 15 | ~500MB | Brave es el mayor |
 | Firmware | 7 | ~100MB | AMD + Realtek |
 | Audio | 8 | ~50MB | Pipewire stack |
 | Temas/Fuentes | 20 | ~80MB | Arc + Papirus |

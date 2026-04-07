@@ -11,10 +11,10 @@ Script de instalación automática para **mi PC específica**: AMD Athlon II X4 
 
 ```
 CPU:     AMD Athlon II X4 640 @ 3.0 GHz (4 núcleos, Socket AM3)
-GPU:     AMD Radeon HD 3000 Series
-RAM:     8 GB DDR3 @ 1333 MHz
-DISCO:   SSD SATA 120-240 GB
-MONITOR: VGA @ 75Hz (1440x900 o 1280x1024)
+GPU:     AMD Radeon HD 3000 Series (TeraScale 1)
+RAM:     8 GB DDR3
+DISCOS:  Root en BTRFS, Home/Datos en XFS (optimizado con inode64 y noatime)
+MONITOR: L192WS @ 60Hz (1440x900)
 ```
 
 **⚠️ IMPORTANTE:** Este script está CALIBRADO para este hardware. Si tienes otra cosa, puede funcionar pero no está optimizado para ello.
@@ -48,9 +48,9 @@ Todo está en este README. Los archivos antiguos de documentación fueron elimin
 
 4. **GPU Radeon HD 3000 Acelerada**
    - Driver radeon libre con TearFree (sin tearing)
-   - DRI3 + Glamor acceleration
-   - OpenGL 2.1 acelerado por hardware
-   - **Resultado:** YouTube 720p fluido, 1080p usable
+   - DRI3 + Aceleración EXA (ideal para hardware TeraScale 1)
+   - OpenGL 2.1 acelerado por hardware y VA-API
+   - **Resultado:** YouTube 720p fluido, decodificación por hardware nativa
 
 5. **SSD Ultra Optimizado**
    - `noatime` → Menos escrituras innecesarias
@@ -63,9 +63,9 @@ Todo está en este README. Los archivos antiguos de documentación fueron elimin
    - Módulos innecesarios bloqueados (bluetooth, watchdog, etc)
    - **Resultado:** +150MB RAM libre, menos overhead
 
-7. **Monitor VGA @ 75Hz**
-   - Configuración automática a 75Hz
-   - **Resultado:** Movimiento más suave que 60Hz
+7. **Monitor L192WS @ 60Hz**
+   - Configuración manual automática a resolucion nativa 1440x900 @ 60Hz
+   - **Resultado:** Refresh natural sin artefactos de xrandr
 
 8. **Sistema Ultra Ligero**
    - i3wm en vez de GNOME/KDE
@@ -80,10 +80,11 @@ Todo está en este README. Los archivos antiguos de documentación fueron elimin
 - alacritty (terminal GPU-acelerado)
 
 **Apps Diarias:**
-- Chromium (navegador)
-- MPV (videos)
+- Brave (navegador pre-configurado para CPU/GPU vieja)
+- MPV (videos, config vaapi optimizado)
 - Zathura (PDFs)
 - PCManFM (archivos)
+- Timeshift (respaldos del sistema)
 - scrot (capturas de pantalla)
 
 **Sistema:**
@@ -104,12 +105,15 @@ git clone https://github.com/EliKat2005/script-debian13-i3wm.git
 cd script-debian13-i3wm
 ```
 
-2. **Ejecuta como root:**
+2. **Ejecuta como root la parte 1 (Sistema):**
 ```bash
 sudo bash script-Debian13-i3wm.sh
 ```
 
-3. **Espera 10-15 minutos** (tomando café ☕)
+3. **Ejecuta la parte 2 (Usuario) sin sudo:**
+```bash
+bash setup-user-config.sh
+```
 
 4. **Reinicia:**
 ```bash
@@ -117,8 +121,7 @@ sudo reboot
 ```
 
 5. **Inicia sesión:**
-   - Selecciona "i3" en LightDM (arriba a la derecha)
-   - Presiona Enter dos veces cuando i3 pregunte
+   - Selecciona "i3" en LightDM
    - ¡Listo! 🎉
 
 ---
@@ -287,9 +290,9 @@ Este script usa optimizaciones agresivas para máximo rendimiento:
 ## 🎯 Lo Que Puedo Hacer con mi PC Ahora
 
 **✅ Perfecto (60 FPS+):**
-- Navegar web (20-25 pestañas Chrome sin lag)
-- YouTube 720p fluido, 1080p perfecto
-- Ver películas 1080p sin drops
+- Navegar web (20-25 pestañas en Brave sin lag)
+- YouTube 720p/1080p fluido gracias a VA-API
+- Ver películas 1080p en mpv sin drops (hwdec=vaapi)
 - Programar (VS Code, compilar proyectos medianos)
 - PDFs, emails, docs
 - Música streaming (Spotify web, YouTube Music)

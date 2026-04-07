@@ -53,7 +53,7 @@ log "Directorio home: $HOME"
 log "Creando estructura de directorios..."
 
 # Directorios de configuración
-for dir in "$HOME/.config/i3" "$HOME/.config/i3status" "$HOME/.config/alacritty"; do
+for dir in "$HOME/.config/i3" "$HOME/.config/i3status" "$HOME/.config/alacritty" "$HOME/.config/dunst" "$HOME/.config/mpv"; do
     if mkdir -p "$dir"; then
         [[ ! -d "$dir" ]] && warn "No se pudo crear: $dir"
     fi
@@ -93,15 +93,91 @@ cat > "$HOME/.config/alacritty/alacritty.toml" <<'ALACRITTY'
 [font]
 size = 10.5
 [font.normal]
-family = "Monospace"
+family = "JetBrains Mono"
 style = "Regular"
-[window]
-opacity = 0.95
 [colors.primary]
 background = "#0a0a0a"
 foreground = "#eeeeee"
 ALACRITTY
 log "✓ Alacritty configurado"
+
+# ─── BRAVE BROWSER FLAGS ───
+log "Configurando aceleración de hardware para Brave..."
+cat > "$HOME/.config/brave-flags.conf" <<'BRAVEFLAGS'
+--enable-features=VaapiVideoDecoder,VaapiVideoEncoder
+--ignore-gpu-blocklist
+--enable-gpu-rasterization
+--use-gl=egl
+BRAVEFLAGS
+log "✓ Brave configurado"
+
+# ─── NOTIFICACIONES (DUNST) ───
+log "Configurando Dunst (Notificaciones temporizadas)..."
+backup_if_exists "$HOME/.config/dunst/dunstrc"
+cat > "$HOME/.config/dunst/dunstrc" <<'DUNSTRC'
+[global]
+font = Noto Sans 10
+markup = full
+format = "<b>%s</b>\n%b"
+sort = yes
+indicate_hidden = yes
+alignment = left
+show_age_threshold = 60
+word_wrap = yes
+ignore_newline = no
+width = 300
+height = 200
+origin = top-right
+offset = 20x40
+shrink = no
+idle_threshold = 120
+monitor = 0
+follow = none
+sticky_history = yes
+history_length = 20
+show_indicators = yes
+line_height = 0
+separator_height = 2
+padding = 8
+horizontal_padding = 8
+separator_color = frame
+frame_width = 2
+frame_color = "#005577"
+
+[urgency_low]
+background = "#1a1a1a"
+foreground = "#dddddd"
+timeout = 3
+
+[urgency_normal]
+background = "#1a1a1a"
+foreground = "#ffffff"
+timeout = 5
+
+[urgency_critical]
+background = "#900000"
+foreground = "#ffffff"
+frame_color = "#ff0000"
+timeout = 0
+DUNSTRC
+log "✓ Dunst configurado"
+
+# ─── REPRODUCTOR MPV (HARDWARE ACCEL) ───
+log "Configurando mpv..."
+backup_if_exists "$HOME/.config/mpv/mpv.conf"
+cat > "$HOME/.config/mpv/mpv.conf" <<'MPVCONF'
+# Perfil rápido adaptado a hardware legacy
+profile=fast
+# Usar decodificación por hardware AMD (vaapi)
+hwdec=vaapi
+vo=gpu
+gpu-context=x11egl
+# Limitar calidad caché para ahorrar RAM
+cache=yes
+demuxer-max-bytes=150M
+demuxer-max-back-bytes=50M
+MPVCONF
+log "✓ mpv configurado"
 
 # ─── I3 CONFIG (PERSONALIZADA) ───
 log "Configurando i3wm..."
@@ -110,7 +186,7 @@ cat > "$HOME/.config/i3/config" <<'I3CONF'
 # --- VARIABLES ---
 set $mod Mod4
 set $term alacritty
-set $browser chromium
+set $browser brave-browser
 set $files pcmanfm
 
 # --- FUENTES Y SISTEMA ---
@@ -142,11 +218,6 @@ set $ws2 "2"
 set $ws3 "3"
 set $ws4 "4"
 set $ws5 "5"
-set $ws6 "6"
-set $ws7 "7"
-set $ws8 "8"
-set $ws9 "9"
-set $ws10 "10"
 
 # Cambiar a workspace
 bindsym $mod+1 workspace number $ws1
@@ -154,11 +225,6 @@ bindsym $mod+2 workspace number $ws2
 bindsym $mod+3 workspace number $ws3
 bindsym $mod+4 workspace number $ws4
 bindsym $mod+5 workspace number $ws5
-bindsym $mod+6 workspace number $ws6
-bindsym $mod+7 workspace number $ws7
-bindsym $mod+8 workspace number $ws8
-bindsym $mod+9 workspace number $ws9
-bindsym $mod+0 workspace number $ws10
 
 # Mover ventana a workspace
 bindsym $mod+Shift+1 move container to workspace number $ws1
@@ -166,11 +232,6 @@ bindsym $mod+Shift+2 move container to workspace number $ws2
 bindsym $mod+Shift+3 move container to workspace number $ws3
 bindsym $mod+Shift+4 move container to workspace number $ws4
 bindsym $mod+Shift+5 move container to workspace number $ws5
-bindsym $mod+Shift+6 move container to workspace number $ws6
-bindsym $mod+Shift+7 move container to workspace number $ws7
-bindsym $mod+Shift+8 move container to workspace number $ws8
-bindsym $mod+Shift+9 move container to workspace number $ws9
-bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # --- ATAJOS PRINCIPALES ---
 bindsym $mod+Return exec $term
