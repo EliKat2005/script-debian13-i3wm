@@ -125,7 +125,7 @@ PKGS=(
   
   # Utilidades Sistema
   wget curl git unzip p7zip-full btop fastfetch
-  zram-tools
+  zram-tools lm-sensors
   
   # Login Manager
   lightdm lightdm-gtk-greeter
