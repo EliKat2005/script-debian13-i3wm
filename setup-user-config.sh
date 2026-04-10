@@ -318,11 +318,11 @@ general {
 }
 
 order += "cpu_usage"
+order += "memory"
 order += "cpu_temperature 0"
 order += "ethernet _first_"
 order += "disk /"
 order += "disk /home"
-order += "memory"
 order += "tztime local"
 order += "volume master"
 
@@ -334,8 +334,8 @@ cpu_usage {
 
 cpu_temperature 0 {
         format = "TEMP %degrees°C"
-        path = "/sys/class/thermal/thermal_zone0/temp"
-        max_threshold = 75
+        path = "/sys/class/hwmon/hwmon1/temp1_input"
+        max_threshold = 70
 }
 
 ethernet _first_ {
@@ -344,21 +344,21 @@ ethernet _first_ {
 }
 
 disk "/" {
-        format = "ROOT %avail"
+        format = " %avail"
 }
 
 disk "/home" {
-        format = "HOME %avail"
+        format = " %avail"
 }
 
 memory {
-        format = "RAM %used"
+        format = " %used"
         threshold_degraded = "1G"
         format_degraded = "RAM < %available"
 }
 
 tztime local {
-        format = "%Y-%m-%d %H:%M"
+        format = " %H:%M"
 }
 
 volume master {
