@@ -195,6 +195,7 @@ floating_modifier $mod
 
 # --- INICIO AUTOMÁTICO ---
 exec --no-startup-id /usr/local/bin/monitor-setup
+exec --no-startup-id lxpolkit
 exec --no-startup-id feh --bg-fill /usr/share/images/desktop-base/default
 exec --no-startup-id nm-applet
 exec --no-startup-id dunst
