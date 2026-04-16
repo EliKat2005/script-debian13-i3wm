@@ -275,7 +275,11 @@ bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m '¿Qué deseas hacer?' -B 'Apagar' 'systemctl poweroff' -B 'Reiniciar' 'systemctl reboot' -B 'Cerrar Sesión' 'i3-msg exit'"
 
 # Captura de pantalla
-bindsym Print exec scrot '%Y-%m-%d_%H-%M-%S.png' -e 'mv $f ~/ && notify-send "Captura guardada" "$f"'
+# Captura de pantalla completa (Tecla Print)
+bindsym Print exec scrot '/home/elian/Imágenes/Captura_%Y-%m-%d_%H-%M-%S.png' -e 'xclip -selection clipboard -t image/png -i $f && notify-send "📸 Pantalla completa" "Guardada y copiada"'
+
+# Captura de área seleccionada (Shift + Tecla Print)
+bindsym Shift+Print exec scrot -s '/home/elian/Imágenes/Recorte_%Y-%m-%d_%H-%M-%S.png' -e 'xclip -selection clipboard -t image/png -i $f && notify-send "✂️ Recorte de área" "Guardado y copiado"'
 
 # Bloqueo
 bindsym $mod+l exec i3lock -c 000000
