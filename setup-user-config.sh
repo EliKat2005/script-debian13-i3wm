@@ -90,14 +90,67 @@ log "✓ Directorios XDG configurados"
 log "Configurando Alacritty..."
 backup_if_exists "$HOME/.config/alacritty/alacritty.toml"
 cat > "$HOME/.config/alacritty/alacritty.toml" <<'ALACRITTY'
+[window]
+# Espaciado interno: Le da "aire" al texto y se ve mucho más limpio
+padding = { x = 24, y = 24 }
+dynamic_padding = true
+# Quita los bordes inútiles si i3 ya los maneja
+decorations = "none"
+
+[scrolling]
+# Guarda hasta 10,000 líneas de comandos anteriores (vital para auditorías largas)
+history = 10000
+multiplier = 3
+
 [font]
 size = 10.5
+
 [font.normal]
 family = "JetBrains Mono"
 style = "Regular"
+
+[font.bold]
+family = "JetBrains Mono"
+style = "Bold"
+
+[font.italic]
+family = "JetBrains Mono"
+style = "Italic"
+
+[cursor]
+# Cursor de bloque parpadeante: Muy visible y con estilo moderno
+style = { shape = "Block", blinking = "On" }
+blink_interval = 500
+
+# Esquema de colores "One Dark" (Profesional, reduce fatiga visual)
 [colors.primary]
-background = "#0a0a0a"
-foreground = "#eeeeee"
+background = "#1e2127"
+foreground = "#abb2bf"
+
+[colors.cursor]
+text = "#1e2127"
+cursor = "#528bff"
+
+# Colores de sintaxis ajustados para máxima legibilidad sin ser "neón"
+[colors.normal]
+black   = "#1e2127"
+red     = "#e06c75"
+green   = "#98c379"
+yellow  = "#d19a66"
+blue    = "#61afef"
+magenta = "#c678dd"
+cyan    = "#56b6c2"
+white   = "#abb2bf"
+
+[colors.bright]
+black   = "#5c6370"
+red     = "#e06c75"
+green   = "#98c379"
+yellow  = "#d19a66"
+blue    = "#61afef"
+magenta = "#c678dd"
+cyan    = "#56b6c2"
+white   = "#ffffff"
 ALACRITTY
 log "✓ Alacritty configurado"
 
