@@ -169,8 +169,10 @@ log "Configurando Dunst (Notificaciones temporizadas)..."
 backup_if_exists "$HOME/.config/dunst/dunstrc"
 cat > "$HOME/.config/dunst/dunstrc" <<'DUNSTRC'
 [global]
-font = Noto Sans 10
+# Tipografía limpia y tamaño equilibrado
+font = Noto Sans 11
 markup = full
+# Formato: Título en negrita, salto de línea, cuerpo del mensaje
 format = "<b>%s</b>\n%b"
 sort = yes
 indicate_hidden = yes
@@ -178,39 +180,52 @@ alignment = left
 show_age_threshold = 60
 word_wrap = yes
 ignore_newline = no
-width = 300
-height = 200
+
+# Geometría: Un poco más ancha para mensajes largos y separada de las esquinas
+width = 340
+height = 300
 origin = top-right
-offset = 20x40
+offset = 24x24
 shrink = no
+
+# Comportamiento
 idle_threshold = 120
 monitor = 0
 follow = none
 sticky_history = yes
 history_length = 20
 show_indicators = yes
-line_height = 0
+
+# --- LA MAGIA DEL DISEÑO ---
+# Interlineado y márgenes amplios (el "aire" que necesita el texto)
+line_height = 4
 separator_height = 2
-padding = 8
-horizontal_padding = 8
+padding = 16
+horizontal_padding = 16
+
+# Bordes y esquinas
 separator_color = frame
 frame_width = 2
-frame_color = "#005577"
+# Esquinas redondeadas (estética actual sin usar blur)
+corner_radius = 8
 
+# Paleta One Dark Base (Fondo gris oscuro elegante, texto claro)
 [urgency_low]
-background = "#1a1a1a"
-foreground = "#dddddd"
+background = "#1e2127"
+foreground = "#abb2bf"
+frame_color = "#282c34"
 timeout = 3
 
 [urgency_normal]
-background = "#1a1a1a"
-foreground = "#ffffff"
+background = "#1e2127"
+foreground = "#abb2bf"
+frame_color = "#61afef"  # Borde azul One Dark
 timeout = 5
 
 [urgency_critical]
-background = "#900000"
-foreground = "#ffffff"
-frame_color = "#ff0000"
+background = "#1e2127"
+foreground = "#e06c75"  # Texto rojo One Dark
+frame_color = "#e06c75" # Borde rojo intenso
 timeout = 0
 DUNSTRC
 log "✓ Dunst configurado"
