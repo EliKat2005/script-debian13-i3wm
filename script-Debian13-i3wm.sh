@@ -294,7 +294,7 @@ Section "Device"
     Identifier "Radeon 3000"
     Driver "radeon"
     Option "TearFree" "on"
-    Option "DRI" "3"
+    Option "DRI" "2"
     Option "AccelMethod" "EXA"
     Option "MigrationHeuristic" "greedy"
 EndSection
