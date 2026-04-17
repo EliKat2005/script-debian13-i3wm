@@ -17,13 +17,8 @@ DISCOS:  Root en BTRFS, Home/Datos en XFS (optimizado con inode64 y noatime)
 MONITOR: L192WS @ 60Hz (1440x900)
 ```
 
-**⚠️ IMPORTANTE:** Este script está CALIBRADO para este hardware. Si tienes otra cosa, puede funcionar pero no está optimizado para ello.
-
 ---
 
-## 📚 Documentación Adicional
-
-Todo está en este README. Los archivos antiguos de documentación fueron eliminados para mantener el proyecto simple y directo.
 
 ## ⚡ Lo Que Hace Este Script (En mi PC)
 
@@ -171,77 +166,6 @@ Print                → Captura de pantalla
 
 **Más atajos:** `nano ~/.config/i3/config`
 
----
-
-## 🔧 Problemas Comunes
-
-### Monitor no se ve / Pantalla negra
-
-```bash
-# Verifica tu salida (VGA, HDMI, DVI):
-xrandr
-
-# Edita el script de monitor:
-sudo nano /usr/local/bin/monitor-setup
-# Cambia VGA-0 por tu salida real
-```
-
-### GPU no acelera
-
-```bash
-# Verifica driver:
-lspci -k | grep -A 3 VGA
-# Debe decir: Kernel driver in use: radeon
-
-# Prueba aceleración:
-glxgears
-# Deberías ver 500-800 FPS en mi Radeon HD 3000
-```
-
-### Audio no funciona
-
-```bash
-# Test de audio:
-speaker-test -t wav -c 2
-
-# Ajustar volumen:
-pavucontrol
-```
-
-### ZRAM no está activa
-
-```bash
-# Verifica:
-zramctl
-
-# Si no aparece, reinicia servicio:
-sudo systemctl restart zramswap
-```
-
-## 💡 Personalizar (Lo Básico)
-
-### Cambiar wallpaper
-
-```bash
-# Pon tu imagen en:
-~/Wallpapers/default.jpg
-
-# Recarga i3:
-Mod + Shift + R
-```
-
-### Cambiar tema
-
-```bash
-lxappearance
-```
-
-### Editar config de i3
-
-```bash
-nano ~/.config/i3/config
-# Después: Mod + Shift + R para recargar
-```
 
 ---
 
