@@ -124,7 +124,7 @@ PKGS=(
   rtkit                 # Real-time scheduling para audio
   
   # Utilidades Sistema
-  wget curl git unzip p7zip-full btop fastfetch
+  wget curl git unzip p7zip-full btop fastfetch xarchiver
   zram-tools lm-sensors lxpolkit pkexec libnotify-bin  xclip
   
   # Login Manager
